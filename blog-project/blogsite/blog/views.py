@@ -3,9 +3,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic import (
     TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView)
-from blog.models import Post, Comment
+from blog.models import Post, Comment, User
 from django.utils import timezone
-from blog.forms import PostForm, CommentForm
+from blog.forms import PostForm, CommentForm, CustomUserCreationForm
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
 # Create your views here.
@@ -20,7 +20,9 @@ class PostListViews(ListView):
 
     def get_queryset(self):
         return Post.objects.filter(
-            published_date__lte=timezone.now()).filter(published_date__isnull=False).order_by('-published_date')
+            published_date__lte=timezone.now()).filter(
+            published_date__isnull=False
+        ).order_by('-published_date')
 
 
 class PostDetailView(DetailView):
@@ -94,3 +96,19 @@ def post_publish(request, pk):
     post = get_object_or_404(Post, pk=pk)
     post.publish()
     return redirect('post_detail', pk=pk)
+
+
+def SignUp(request):
+    """Signup user."""
+    if request.user.is_authenticated:
+        return redirect('login')
+    if request.method == 'GET':
+        form = CustomUserCreationForm()
+        return render(request, 'blog/user_form.html', {'form': form})
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+        else:
+            return render(request, 'blog/user_form.html', {'form': form})

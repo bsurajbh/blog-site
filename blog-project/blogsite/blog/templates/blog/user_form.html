@@ -4,12 +4,14 @@
 <div class="jumbotron">
   <h2>Please Login:</h2>
   {% if form.errors %}
-  <p>username or password didnt match</p>
+  {% for error in form.errors %}
+  <p>{{error}}</p>
+  {% endfor %}
   {% endif %}
-  <form class="" action="{% url 'login' %}" method="POST">
+  <form class=""  method="POST">
     {% csrf_token %}
     {{form.as_p}}
-    <input type="submit" name="submit" class='btn btn-primary' value="Login">
+    <input type="submit" name="submit" class='btn btn-primary' value="Register">
     <input type="hidden" name="next" value="{{next}}">
   </form>
 </div>

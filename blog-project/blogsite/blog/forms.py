@@ -1,5 +1,6 @@
 from django import forms
-from blog.models import Post, Comment
+from blog.models import Post, Comment, User
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 
 class PostForm(forms.ModelForm):
@@ -24,3 +25,10 @@ class CommentForm(forms.ModelForm):
             'text': forms.Textarea(attrs={
                 'class': 'editable medium-editor-textarea postcontent'})
         }
+
+
+class CustomUserCreationForm(UserCreationForm):
+
+    class Meta(UserCreationForm):
+        model = User
+        fields = ('email',)
