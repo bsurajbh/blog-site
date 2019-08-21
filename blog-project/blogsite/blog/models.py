@@ -1,11 +1,9 @@
-"""django model."""
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
-# from .managers import UserManager
 from django.contrib.auth.base_user import BaseUserManager
 
 
@@ -26,9 +24,6 @@ class UserManager(BaseUserManager):
 
     def create_user(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_superuser', False)
-        print(email)
-        print(password)
-        # print(extra_fields)
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
@@ -44,8 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     """Custom user model."""
 
     email = models.EmailField(_('email address'), unique=True)
-    first_name = models.CharField(_('first name'), max_length=30, blank=True)
-    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    name = models.CharField(_('name'), max_length=30)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     is_active = models.BooleanField(_('active'), default=True)
     is_superadmin = models.BooleanField(_('active'), default=True)
@@ -66,11 +60,24 @@ class User(AbstractBaseUser, PermissionsMixin):
         return reverse("login")
 
 
+class Category(models.Model):
+    """Blog category."""
+
+    name = models.CharField(_('name'), unique=True, max_length=200)
+
+    def __str__(self):
+        """Category string representation."""
+        return self.name
+
+
 class Post(models.Model):
     """post model."""
 
     author = models.ForeignKey(User,  on_delete='cascade')
     title = models.CharField(max_length=255)
+    category = models.ForeignKey(
+        'blog.Category', related_name='category',
+        on_delete='cascade', max_length=200)
     text = models.TextField()
     create_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)

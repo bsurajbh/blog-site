@@ -3,12 +3,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic import (
     TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView)
-from blog.models import Post, Comment, User
+from blog.models import Post, Comment, User, Category
 from django.utils import timezone
 from blog.forms import PostForm, CommentForm, CustomUserCreationForm
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
-# Create your views here.
+from django.contrib import messages
 
 
 class AboutView(TemplateView):
@@ -19,10 +19,17 @@ class PostListViews(ListView):
     model = Post
 
     def get_queryset(self):
+        """Display Default data."""
         return Post.objects.filter(
             published_date__lte=timezone.now()).filter(
             published_date__isnull=False
         ).order_by('-published_date')
+
+    def get_context_data(self, **kwargs):
+        """Add category list."""
+        context = super(PostListViews, self).get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        return context
 
 
 class PostDetailView(DetailView):
@@ -34,6 +41,12 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     redirect_field_name = 'blog/post_detail.html'
     model = Post
     form_class = PostForm
+
+    def form_valid(self, form):
+        model = form.save(commit=False)
+        form.instance.author_id = self.request.user.id
+        print(self.request.user)
+        return super(CreatePostView, self).form_valid(form)
 
 
 class UpdatePostView(LoginRequiredMixin, UpdateView):
@@ -109,6 +122,8 @@ def SignUp(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.add_message(request, messages.SUCCESS,
+                                 'Registration successful. Please Login')
             return redirect('login')
         else:
             return render(request, 'blog/user_form.html', {'form': form})

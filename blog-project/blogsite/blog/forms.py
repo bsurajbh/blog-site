@@ -6,12 +6,14 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 class PostForm(forms.ModelForm):
     class Meta():
         model = Post
-        fields = ('author', 'title', 'text')
+        fields = ('title', 'text', 'category')
 
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'textinputclass'}),
+            'title': forms.TextInput(attrs={'class': 'textinputclass \
+                                            form-control'}),
             'text': forms.Textarea(attrs={
-                'class': 'editable medium-editor-textarea postcontent '})
+                'class': 'editable medium-editor-textarea postcontent \
+                form-control'})
         }
 
 
@@ -21,9 +23,11 @@ class CommentForm(forms.ModelForm):
         fields = ('author', 'text')
 
         widgets = {
-            'author': forms.TextInput(attrs={'class': 'textinputclass'}),
+            'author': forms.TextInput(attrs={'class': 'textinputclass \
+                                             form-control'}),
             'text': forms.Textarea(attrs={
-                'class': 'editable medium-editor-textarea postcontent'})
+                'class': 'editable medium-editor-textarea postcontent \
+                                            form-control'})
         }
 
 
@@ -31,4 +35,4 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta(UserCreationForm):
         model = User
-        fields = ('email',)
+        fields = ('email', 'name')
