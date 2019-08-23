@@ -73,11 +73,11 @@ class Category(models.Model):
 class Post(models.Model):
     """post model."""
 
-    author = models.ForeignKey(User,  on_delete='cascade')
+    author = models.ForeignKey(User,  on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     category = models.ForeignKey(
         'blog.Category', related_name='category',
-        on_delete='cascade', max_length=200)
+        on_delete=models.CASCADE, max_length=200)
     text = models.TextField()
     create_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
@@ -104,7 +104,7 @@ class Comment(models.Model):
     """Comment model."""
 
     post = models.ForeignKey(
-        'blog.Post', related_name='comments', on_delete='cascade')
+        'blog.Post', related_name='comments', on_delete=models.CASCADE)
     author = models.CharField(max_length=200)
     text = models.TextField()
     create_date = models.DateTimeField(default=timezone.now)

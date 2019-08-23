@@ -24,7 +24,9 @@
   <p>
     <img class="img-fluid rounded" src="http://placehold.it/900x300" alt="">
   </p>
-
+<p>
+{{post.text|truncatechars:50}}
+</p>
   <!-- Post Content -->
   <a href="{% url 'post_detail' pk=post.pk %}">Comments : {{post.approve_comments.count}}</a>
   <hr>

@@ -20,7 +20,11 @@ class PostListViews(ListView):
 
     def get_queryset(self):
         """Display Default data."""
-        return Post.objects.filter(
+        self.queryset = Post.objects.all()
+        if self.request.user.is_authenticated:
+            self.queryset = self.queryset.filter(author=self.request.user)
+
+        return self.queryset.filter(
             published_date__lte=timezone.now()).filter(
             published_date__isnull=False
         ).order_by('-published_date')
