@@ -23,6 +23,7 @@ cd blogsite/
 mysql -u your yousername -p                   #log into mysql and create blog database 
 create database blog;
 exit
-python3 manage.py migrate                     #migrate database
+python3 manage.py migrate #migrate database
+python3 manage.py seeder.py
 python3 manage.py runserver
 ```
