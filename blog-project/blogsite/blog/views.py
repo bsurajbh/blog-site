@@ -9,13 +9,38 @@ from blog.forms import PostForm, CommentForm, CustomUserCreationForm, BlogFilter
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.views.decorators.cache import cache_page
+from django.conf import settings
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
-class AboutView(TemplateView):
+class CacheMixin(object):
+    """
+    Add this mixin to a view to cache it.
+
+    Disables caching for logged-in users.
+    """
+    cache_timeout = CACHE_TTL
+
+    def get_cache_timeout(self):
+        return self.cache_timeout
+
+    def dispatch(self, *args, **kwargs):
+        if hasattr(self.request, 'user') and self.request.user.is_authenticated:
+            # Logged-in, return the page without caching.
+            return super().dispatch(*args, **kwargs)
+        else:
+            # Unauthenticated user; use caching.
+            return cache_page(self.get_cache_timeout())(super().dispatch)(*args, **kwargs)
+
+
+class AboutView(CacheMixin, TemplateView):
     template_name = 'about.html'
 
 
-class PostListViews(ListView):
+class PostListViews(CacheMixin, ListView):
     model = Post
 
     def get_queryset(self):
@@ -39,7 +64,7 @@ class PostListViews(ListView):
         return context
 
 
-class PostDetailView(DetailView):
+class PostDetailView(CacheMixin, DetailView):
     model = Post
 
 
@@ -120,6 +145,7 @@ def post_publish(request, pk):
     return redirect('post_detail', pk=pk)
 
 
+@cache_page(CACHE_TTL)
 def SignUp(request):
     """Signup user."""
     if request.user.is_authenticated:
