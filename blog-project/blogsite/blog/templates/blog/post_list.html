@@ -1,38 +1,41 @@
 {% extends 'blog/base.html' %}
 {% block body_block %}
+{% if post_list%}
+{% for post in post_list %}
 
-  {% for post in post_list %}
+<!-- Post Content Column -->
 
-  <!-- Post Content Column -->
+<!-- Title -->
+<h1 class="mt-4"><a href="{% url 'post_detail' pk=post.pk %}">{{post.title}}</a></h1>
 
-  <!-- Title -->
-  <h1 class="mt-4"><a href="{% url 'post_detail' pk=post.pk %}">{{post.title}}</a></h1>
-
-  <!-- Author -->
-  <p class="lead">
+<!-- Author -->
+<p class="lead">
     by
-    <a href="#">{{post.author.name}}</a>
-  </p>
-
-  <!-- Date/Time -->
-  <div class="date">
-    <h6>{{post.published_date}}</h6>
-  </div>
-  <!-- <hr> -->
-
-  <!-- Preview Image -->
-  <p>
-    <img class="img-fluid rounded" src="http://placehold.it/900x300" alt="">
-  </p>
-<p>
-{{post.text|truncatechars:50}}
+    <a href="#">{{post.author.email}}</a>
 </p>
-  <!-- Post Content -->
-  <a href="{% url 'post_detail' pk=post.pk %}">Comments : {{post.approve_comments.count}}</a>
-  <hr>
 
-  <!-- <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus, vero, obcaecati, aut, error quam sapiente nemo saepe quibusdam sit excepturi nam quia corporis eligendi eos magni recusandae laborum minus inventore?</p> -->
+<!-- Date/Time -->
+<div class="date">
+    <h6>{{post.published_date}}</h6>
+</div>
+<!-- <hr> -->
 
-  <!-- <hr> -->
-  {% endfor %}
+<!-- Preview Image -->
+<p>
+    <img class="img-fluid rounded" src="http://placehold.it/900x300" alt="">
+</p>
+<p>
+    {{post.text|truncatechars:50}}
+</p>
+<!-- Post Content -->
+<a href="{% url 'post_detail' pk=post.pk %}">Comments : {{post.approve_comments.count}}</a>
+<hr>
+
+<!-- <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus, vero, obcaecati, aut, error quam sapiente nemo saepe quibusdam sit excepturi nam quia corporis eligendi eos magni recusandae laborum minus inventore?</p> -->
+
+<!-- <hr> -->
+{% endfor %}
+{% else %}
+<p>No blogs found </p>
+{% endif %}
 {% endblock %}

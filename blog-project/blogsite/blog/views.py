@@ -5,7 +5,7 @@ from django.views.generic import (
     TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView)
 from blog.models import Post, Comment, User, Category
 from django.utils import timezone
-from blog.forms import PostForm, CommentForm, CustomUserCreationForm
+from blog.forms import PostForm, CommentForm, CustomUserCreationForm, BlogFilter
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
@@ -20,18 +20,21 @@ class PostListViews(ListView):
 
     def get_queryset(self):
         """Display Default data."""
-        self.queryset = Post.objects.all()
+        queryset = Post.objects.all()
         if self.request.user.is_authenticated:
-            self.queryset = self.queryset.filter(author=self.request.user)
+            queryset = queryset.filter(author=self.request.user)
 
-        return self.queryset.filter(
+        queryset = queryset.filter(
             published_date__lte=timezone.now()).filter(
             published_date__isnull=False
         ).order_by('-published_date')
 
+        filtered_list = BlogFilter(self.request.GET, queryset=queryset)
+        return filtered_list.qs
+
     def get_context_data(self, **kwargs):
         """Add category list."""
-        context = super(PostListViews, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
         return context
 
@@ -47,9 +50,8 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     form_class = PostForm
 
     def form_valid(self, form):
-        model = form.save(commit=False)
+        form.save(commit=False)
         form.instance.author_id = self.request.user.id
-        print(self.request.user)
         return super(CreatePostView, self).form_valid(form)
 
 
@@ -59,9 +61,13 @@ class UpdatePostView(LoginRequiredMixin, UpdateView):
     model = Post
     form_class = PostForm
 
+    def form_valid(self, form):
+        form.save(commit=False)
+        form.instance.published_date = None
+        return super(UpdatePostView, self).form_valid(form)
+
 
 class DeletePostView(LoginRequiredMixin, DeleteView):
-
     model = Post
     success_url = reverse_lazy('post_list')
 
@@ -73,9 +79,8 @@ class DraftListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Post.objects.filter(
-            published_date__isnull=True).order_by('create_date')
-
-# comments section
+            published_date__isnull=True
+        ).order_by('create_date')
 
 
 @login_required

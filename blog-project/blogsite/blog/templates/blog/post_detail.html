@@ -2,37 +2,48 @@
 {% block body_block %}
 <h1 class="posttitle loader ">{{post.title}}</h1>
 <div class="">
-  <p class="postcontent">{{post.text|safe|linebreaksbr}}</p>
+    <p class="postcontent">{{post.text|safe|linebreaksbr}}</p>
 </div>
-{% if post.published_date  and user.is_authenticated %}
-<a href="{% url 'post_publish' pk=post.pk %}"class="btn btn-success"><i class="fa fa-paper-plane"></i> Publish </a>
+{% if user.is_authenticated %}
+{% if post.published_date %}
+<div class="date postdate">
+    {{post.published_date}}
+</div>
+
 <a href="{% url 'post_edit' pk=post.pk  %}" class="btn btn-primary"><i class="fa fa-edit"></i> Edit post </a>
 <a href="{% url 'post_remove' pk=post.pk  %}" class="btn btn-danger"><i class="fa fa-trash"></i> Remove post </a>
 {% else %}
+
 <div class="date postdate">
-  {{post.published_date}}
+    <p>Article not published yet</p>
+<a href="{% url 'post_publish' pk=post.pk %}" class="btn btn-success"><i class="fa fa-paper-plane"></i> Publish </a>
+<a href="{% url 'post_edit' pk=post.pk  %}" class="btn btn-primary"><i class="fa fa-edit"></i> Edit post </a>
+<a href="{% url 'post_remove' pk=post.pk  %}" class="btn btn-danger"><i class="fa fa-trash"></i> Remove post </a>
 </div>
+{% endif %}
+
+
 {% endif %}
 
 <hr>
 <!-- <a href="{% url 'add_comment_to_post' pk=post.pk %}">Add comment</a> -->
 
 <div class="container">
-  {% for comment in post.comments.all %}
+    {% for comment in post.comments.all %}
 
-  {% if user.is_authenticated or comment.approved_comment %}
-  {{comment.create_date}}
-  {% if not comment.approved_comment %}
-  <a class="text-danger fa fa-times" href="{% url 'comment_remove' pk=comment.pk  %}"></a>&nbsp
-  <a class="text-success fa fa-check" href="{% url 'comment_approve' pk=comment.pk  %}"></a>
-  {% endif %}
+    {% if user.is_authenticated or comment.approved_comment %}
+    {{comment.create_date}}
+    {% if not comment.approved_comment %}
+    <a class="text-danger fa fa-times" href="{% url 'comment_remove' pk=comment.pk  %}"></a>&nbsp
+    <a class="text-success fa fa-check" href="{% url 'comment_approve' pk=comment.pk  %}"></a>
+    {% endif %}
 
-  <p>{{comment.text|safe|linebreaksbr}}</p>
-  <p>Posted by : {{ comments.author }}</p>
+    <p>{{comment.text|safe|linebreaksbr}}</p>
+    <p>Posted by : {{ comments.author }}</p>
 
-  {% endif %}
-  {% empty %}
-  <p>No comments.</p>
-  {% endfor %}
+    {% endif %}
+    {% empty %}
+    <p>No comments.</p>
+    {% endfor %}
 </div>
 {% endblock %}

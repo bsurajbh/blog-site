@@ -73,7 +73,7 @@ class Category(models.Model):
 class Post(models.Model):
     """post model."""
 
-    author = models.ForeignKey(User,  on_delete=models.CASCADE)
+    author = models.ForeignKey(User, related_name='post', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     category = models.ForeignKey(
         'blog.Category', related_name='category',
@@ -92,7 +92,7 @@ class Post(models.Model):
         return self.comments.filter(approved_comment=True)
 
     def __str__(self):
-        """Given String representaion of class."""
+        """Given String representation of class."""
         return self.title
 
     def get_absolute_url(self):
@@ -102,10 +102,9 @@ class Post(models.Model):
 
 class Comment(models.Model):
     """Comment model."""
-
     post = models.ForeignKey(
         'blog.Post', related_name='comments', on_delete=models.CASCADE)
-    author = models.CharField(max_length=200)
+    author = models.OneToOneField(User, on_delete=models.CASCADE)
     text = models.TextField()
     create_date = models.DateTimeField(default=timezone.now)
     approved_comment = models.BooleanField(default=False)
@@ -119,6 +118,6 @@ class Comment(models.Model):
         """Given string representation."""
         return self.text
 
-    def get_absolute_url(self):
+    def get_absolute_url():
         """Return URL."""
         return reverse('post_list')
