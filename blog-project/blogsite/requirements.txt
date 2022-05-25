@@ -9,7 +9,7 @@ djangorestframework-stubs==0.3.0
 mypy==0.770
 mypy-extensions==0.4.3
 Pillow==5.1.0
-PyJWT==1.7.1
+PyJWT==2.4.0
 pytz==2019.3
 redis==3.4.1
 sqlparse==0.3.1
